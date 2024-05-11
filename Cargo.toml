@@ -1,0 +1,12 @@
+[package]
+name = "tempeff"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rustypath = "0.1.1"
+argrust = "0.1.0"
+
+[[bin]]
+name = "tempf"
+path = "src/main.rs"
