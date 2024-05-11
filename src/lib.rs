@@ -9,6 +9,26 @@ pub struct Files {
     files: Vec<File>,
 }
 
+struct Count {
+    value: u64,
+}
+
+impl Count {
+    fn get(&self) -> u64 {
+        self.value
+    }
+
+    fn add(&mut self, val: u64) {
+        self.value = self.value + val;
+    }
+
+    fn new() -> Self{
+        Self{
+            value:0,
+        }
+    }
+}
+
 impl Files {
     pub fn new(path: RPath, recursive: bool) -> Self {
         if recursive {
@@ -72,16 +92,21 @@ impl Files {
         file_rpaths
     }
 
-    pub fn find_duplicates(&mut self) {
-        let mut done: Vec<String> = Vec::new();
+    pub fn find_duplicates(&mut self, explicit: bool) {
+        let mut done: Vec<String> = Vec::new(); // if a file is scanned, dont scan it again
+        let mut count = Count::new();
+        let start_time = std::time::Instant::now();
         for i in 0..=self.files.len()-1 {
             if !done.contains(&self.files[i].path.convert_to_string()) {
-                println!("Scanning {}", self.files[i].path.convert_to_string());
+                if explicit {
+                    println!("Scanning {}", self.files[i].path.convert_to_string());
+                }
                 // read each file's content and check with all other files except itself.
                 let content = std::fs::read(self.files[i].path.convert_to_pathbuf().clone())
                     .expect(&("Unable to read ".to_string()+&self.files[i].path.convert_to_string()));
 
                 done.push(self.files[i].path.clone().convert_to_string());
+                count.add(1);
 
                 // let mut title_count = 0;
                 // let mut filecounts = 1;
@@ -98,6 +123,7 @@ impl Files {
                         if content == content2 {
                             let f = self.files[j].path.clone();
                             done.push(f.convert_to_string());
+                            count.add(1);
 
                             self.files[i].duplicates.push(f);
 
@@ -112,6 +138,15 @@ impl Files {
                     }
                 }
             }
+        }
+
+        let end_time = std::time::Instant::now();
+        let runtime = end_time.duration_since(start_time);
+        println!("");
+        if runtime.as_secs_f64() >= 1.0 {
+            println!("Scanned {} files in {:.2}m.", count.get(), runtime.as_secs_f64()/60.0);
+        } else {
+            println!("Scanned {} files in {:.3}s.", count.get(), runtime.as_secs_f64());
         }
     }
 
@@ -136,6 +171,20 @@ impl Files {
                 if string != file.path.convert_to_string() + " ->{ }" {
                     println!("{}", string);
                 }
+            }
+        }
+    }
+
+    pub fn formatted(&self) {
+        for file in &self.files {
+            if file.duplicates.len() > 0 {
+                println!("{}", file.path.convert_to_string());
+
+                for d in &file.duplicates {
+                    println!("   {}  <- duplicate", d.convert_to_string());
+                }
+
+                println!("");
             }
         }
     }
