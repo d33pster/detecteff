@@ -1,6 +1,7 @@
 use argrust::{Arguments, FetchTypes, ArgumentDescription};
 use detecteff::Files;
 use rustypath::RPath;
+use colorized::*;
 
 fn main() {
     let mut args = Arguments::new(std::env::args().skip(1).collect());
@@ -9,30 +10,38 @@ fn main() {
     args.add("--format", ArgumentDescription::new().short("-f"));
     args.add("--help", ArgumentDescription::new().short("-h"));
     args.add("--version", ArgumentDescription::new().short("-v"));
+    args.add("--delete", ArgumentDescription::new().short("-d"));
 
     
     args.analyse();
 
     if args.ifarg_force("--version") {
-        println!("detecteff v0.1.0");
+        println!("detecteff {}", "v0.1.0".color(Colors::RedFg));
         std::process::exit(0);
     }
 
     if args.ifarg_force("--help") {
-        println!("detecteff help");
-        println!("   -\n   [INFO]");
+        println!("detecteff {}", "help".color(Colors::YellowFg));
+        println!("   -\n   {}","[INFO]".color(Colors::BlueFg));
         println!("   | -h, --help : show help text and exit.");
         println!("   | -v, --version : show version and exit.");
-        println!("   -\n   [FLAG]");
+        println!("   -\n   {}","[FLAG]".color(Colors::BlueFg));
         println!("   | -r, --recursive : recursive mode. Default -> OFF");
         println!("   | -f, --format : show formatted output. Default -> OFF");
-        println!("   -\n   [INPUT]");
+        println!("   -\n   {}","[INPUT]".color(Colors::BlueFg));
         println!("   | -s, --scan <directory> : scan the directory for duplicate files.");
+        println!("   -\n   {}", "[IRREVERSIBLE FLAG]".color(Colors::RedFg));
+        println!("   | -d, --delete : delete any found duplicates. Default -> OFF");
         std::process::exit(0);
     }
 
     let mut recursive = false;
     let mut formatted = false;
+    let mut delete = false;
+
+    if args.ifarg_force("--delete") {
+        delete = true;
+    }
 
     if args.ifarg_force("--recursive") {
         recursive = true;
@@ -55,6 +64,10 @@ fn main() {
             dir.formatted();
         } else {
             dir.show();
+        }
+
+        if delete {
+            dir.delete_duplicates(formatted);
         }
     }
 }

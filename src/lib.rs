@@ -126,14 +126,6 @@ impl Files {
                             count.add(1);
 
                             self.files[i].duplicates.push(f);
-
-                            // if title_count == 0 {
-                            //     println!("{}:", self.files[i].path.convert_to_string());
-                            //     title_count += 1;
-                            // }
-
-                            // println!("{}. {}", filecounts, self.files[j].path.convert_to_string());
-                            // filecounts += 1;
                         }
                     }
                 }
@@ -185,6 +177,38 @@ impl Files {
                 }
 
                 println!("");
+            }
+        }
+    }
+
+    pub fn delete_duplicates(&self, formatted: bool) {
+        for file in &self.files {
+            if file.duplicates.len() > 0 {
+                if formatted {
+                    println!("\n[DELETE]");
+                    println!("{}", file.path.convert_to_string());
+                } else {
+                    println!("\n");
+                }
+                for d in &file.duplicates {
+                    // delete
+                    match std::fs::remove_file(d.convert_to_string()) {
+                        Ok(_) => {
+                            if formatted {
+                                println!("   DELETE {}", d.convert_to_string());
+                            } else {
+                                println!("DELETE {}", d.convert_to_string());
+                            }
+                        },
+                        Err(e) => {
+                            if formatted {
+                                eprintln!("   DELETE ERROR {}: {}", e, d.convert_to_string())
+                            } else {
+                                eprintln!("DELETE ERROR {}: {}", e, d.convert_to_string())
+                            }
+                        }
+                    }
+                }
             }
         }
     }
