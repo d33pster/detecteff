@@ -1,5 +1,5 @@
 use argrust::{Arguments, FetchTypes, ArgumentDescription};
-use tempeff::Files;
+use detecteff::Files;
 use rustypath::RPath;
 
 fn main() {
