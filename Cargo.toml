@@ -1,5 +1,5 @@
 [package]
-name = "tempeff"
+name = "detecteff"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,5 +8,5 @@ rustypath = "0.1.1"
 argrust = "0.1.0"
 
 [[bin]]
-name = "tempf"
+name = "detectf"
 path = "src/main.rs"
