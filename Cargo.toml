@@ -1,11 +1,11 @@
 [package]
 name = "detecteff"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 readme = "README.md"
 license-file = "LICENSE"
 keywords = ["d33pster", "detecteff", "duplicates", "filesystem", "duplicate-files"]
-categories = ["command-line-interface", "filesystem"]
+categories = ["command-line-utilities", "filesystem"]
 description = "Find and delete duplicate files"
 authors = ["Soumyo Deep Gupta <deep.main.ac@gmail.com>"]
 repository = "https://github.com/d33pster/detecteff"
