@@ -164,22 +164,22 @@ impl Files {
     pub fn show(&self) {
         for file in &self.files {
             if file.duplicates.len() > 0 {
-                let mut string = file.path.convert_to_string() + " -> {";
+                let mut string = file.path.convert_to_string().replace("\\\\?\\", "") + " -> {";
 
                 let mut count = 0;
 
                 for d in &file.duplicates {
                     if count > 0 {
-                        string = string + ", " + &d.convert_to_string();
+                        string = string + ", " + &d.convert_to_string().replace("\\\\?\\", "");
                     } else {
-                        string = string + " " + &d.convert_to_string();
+                        string = string + " " + &d.convert_to_string().replace("\\\\?\\", "");
                     }
                     count += 1;
                 }
 
                 string = string + " }";
 
-                if string != file.path.convert_to_string() + " ->{ }" {
+                if string != file.path.convert_to_string().replace("\\\\?\\", "") + " ->{ }" {
                     println!("{}", string);
                 }
             }
@@ -189,10 +189,10 @@ impl Files {
     pub fn formatted(&self) {
         for file in &self.files {
             if file.duplicates.len() > 0 {
-                println!("{}", file.path.convert_to_string());
+                println!("{}", file.path.convert_to_string().replace("\\\\?\\", ""));
 
                 for d in &file.duplicates {
-                    println!("   {}  <- duplicate", d.convert_to_string());
+                    println!("   {}  <- duplicate", d.convert_to_string().replace("\\\\?\\", ""));
                 }
 
                 println!("");
