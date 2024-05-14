@@ -115,7 +115,7 @@ impl Files {
         for i in 0..=self.files.len()-1 {
             if !done.contains(&self.files[i].path.convert_to_string()) {
                 if explicit {
-                    println!("Scanning {}", self.files[i].path.convert_to_string());
+                    println!("Scanning {}", self.files[i].path.convert_to_string().replace("\\\\?\\", ""));
                 }
                 // read each file's content and check with all other files except itself.
                 let content = std::fs::read(self.files[i].path.convert_to_pathbuf().clone())
