@@ -93,6 +93,19 @@ impl Files {
     }
 
     pub fn find_duplicates(&mut self, explicit: bool) {
+        // PRINCIPLE
+        // only files that were scanned and that were found as a duplicate will be added to done list.
+        // if a file is not scanned and not found as a duplicate, it will be subject to either of those things
+        // therefore they will be scanned as a primary file or they will be found as a duplicate
+        
+        // MECHANISM
+        // [FILES], [DONE]
+        // -> take one file from [FILES] and scan it, also add it to [DONE]
+        // -> take another file from [FILES] that is neither the same file as the previous file
+        //    nor is added to [DONE]. Then scan it and if duplicate, then add it to the original file's duplicate list
+        //    and push this current file to [DONE]
+        // -> repeat for files not in [DONE]
+        
         let mut done: Vec<String> = Vec::new(); // if a file is scanned, dont scan it again
         let mut count = Count::new();
         let start_time = std::time::Instant::now();
@@ -114,7 +127,7 @@ impl Files {
                 for j in 0..=self.files.len()-1 {
                     if j == i {
                         continue;
-                    } else {
+                    } else if !done.contains(&self.files[j].path.convert_to_string()){
                         // read content
                         let content2 = std::fs::read(self.files[j].path.convert_to_pathbuf())
                             .expect(&("Unable to read ".to_string()+&self.files[j].path.convert_to_string()));
@@ -127,6 +140,9 @@ impl Files {
 
                             self.files[i].duplicates.push(f);
                         }
+                    } else {
+                        // if already found as a duplicate of some file, nevermind.
+                        continue;
                     }
                 }
             }
