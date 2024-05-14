@@ -48,7 +48,7 @@ impl Files {
         if let Ok(entries) = std::fs::read_dir(path.convert_to_pathbuf()) {
             for entry in entries.flatten() {
                 let file_path = entry.path();
-                if file_path.ends_with(".cargo") {
+                if file_path.ends_with(".cargo") || file_path.ends_with(".git") {
                     continue;
                 }
                 if file_path.is_dir() {
