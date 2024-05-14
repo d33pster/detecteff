@@ -46,6 +46,9 @@ detecteff help
    -
    [INPUT]
    | -s, --scan <directory> : scan the directory for duplicate files.
+   -
+   [IRREVERSIBLE FLAG]
+   | -d, --delete : delete any found duplicates. Default -> OFF
 ```
 
 ## Example Usages
@@ -60,4 +63,10 @@ detectf --scan ~/
 
 ```bash
 detectf --scan ./target -r
+```
+
+For deleting:
+
+```bash
+detectf --scan /path/to/dir/to/scan -r -f -d
 ```
