@@ -154,7 +154,7 @@ impl Files {
         let end_time = std::time::Instant::now();
         let runtime = end_time.duration_since(start_time);
         println!("");
-        if runtime.as_secs_f64() >= 1.0 {
+        if runtime.as_secs_f64() >= 60.0 {
             println!("Scanned {} files in {:.2}m.", count.get(), runtime.as_secs_f64()/60.0);
         } else {
             println!("Scanned {} files in {:.3}s.", count.get(), runtime.as_secs_f64());
