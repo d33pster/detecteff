@@ -214,16 +214,16 @@ impl Files {
                     match std::fs::remove_file(d.convert_to_string()) {
                         Ok(_) => {
                             if formatted {
-                                println!("   DELETE {}", d.convert_to_string());
+                                println!("   DELETE {}", d.convert_to_string().replace("\\\\?\\", ""));
                             } else {
-                                println!("DELETE {}", d.convert_to_string());
+                                println!("DELETE {}", d.convert_to_string().replace("\\\\?\\", ""));
                             }
                         },
                         Err(e) => {
                             if formatted {
-                                eprintln!("   DELETE ERROR {}: {}", e, d.convert_to_string())
+                                eprintln!("   DELETE ERROR {}: {}", e, d.convert_to_string().replace("\\\\?\\", ""));
                             } else {
-                                eprintln!("DELETE ERROR {}: {}", e, d.convert_to_string())
+                                eprintln!("DELETE ERROR {}: {}", e, d.convert_to_string().replace("\\\\?\\", ""));
                             }
                         }
                     }
