@@ -48,9 +48,12 @@ impl Files {
         if let Ok(entries) = std::fs::read_dir(path.convert_to_pathbuf()) {
             for entry in entries.flatten() {
                 let file_path = entry.path();
+                if file_path.ends_with(".cargo") {
+                    continue;
+                }
                 if file_path.is_dir() {
                     // If the entry is a directory, recursively call scan on it
-                    let subdirectory_files = Self::scan(&RPath::new_from_pbuf(&file_path));
+                    let subdirectory_files = Self::scan_recursive(&RPath::new_from_pbuf(&file_path));
                     for sub_file in subdirectory_files {
                         file_rpaths.push(sub_file);
                     }
