@@ -7,6 +7,7 @@
 - Optional Recursive Scan
 - Default Output Format or a better readability output format
 - Thorough
+- super-fast after v0.3.0
 
 ## Installation
 
@@ -14,7 +15,7 @@ In terminal run:
 
 ```console
 $ cargo install detecteff
-  Installing detecteff v0.1.0
+  Installing detecteff v0.3.0
     Updating crates.io index
    Compiling libc v0.2.154
    Compiling option-ext v0.2.0
@@ -22,10 +23,10 @@ $ cargo install detecteff
    Compiling dirs v5.0.1
    Compiling rustypath v0.1.1
    Compiling argrust v0.1.0
-   Compiling detecteff v0.1.0
+   Compiling detecteff v0.3.0
     Finished `release` profile [optimized] target(s) in 8.66s
   Installing /Users/XXXXX/.cargo/bin/detectf
-   Installed package `detecteff v0.1.0 (/Users/XXXXX/detecteff)` (executable `detectf`)
+   Installed package `detecteff v0.3.0 (/Users/XXXXX/detecteff)` (executable `detectf`)
 ```
 
 ## Usage
