@@ -16,7 +16,7 @@ fn main() {
     args.analyse();
 
     if args.ifarg_force("--version") {
-        println!("detecteff {}", "v0.1.0".color(Colors::RedFg));
+        println!("detecteff {}", "v0.3.0".color(Colors::RedFg));
         std::process::exit(0);
     }
 

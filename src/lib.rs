@@ -121,6 +121,8 @@ impl Files {
                 let content = std::fs::read(self.files[i].path.convert_to_pathbuf().clone())
                     .expect(&("Unable to read ".to_string()+&self.files[i].path.convert_to_string()));
 
+                let filesize = std::fs::metadata(self.files[i].path.convert_to_pathbuf()).expect("Failed to find file size.").len();
+
                 done.push(self.files[i].path.clone().convert_to_string());
                 count.add(1);
 
@@ -131,6 +133,21 @@ impl Files {
                     if j == i {
                         continue;
                     } else if !done.contains(&self.files[j].path.convert_to_string()){
+                        // if filesize of the comparing file is not filesize-200< size < filesize+200, dont compare
+                        // this is a game changer -> super fast scanning.
+                        if filesize > 200{
+                            if !(std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() > filesize-200 && std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() < filesize + 200) {
+                                continue;
+                            }
+                        } else if filesize > 100 {
+                            if !(std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() > filesize-100 && std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() < filesize + 100) {
+                                continue;
+                            }
+                        } else if filesize < 100 {
+                            if !(std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() > 0 && std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() < filesize+20) {
+                                continue;
+                            }
+                        }
                         // read content
                         let content2 = std::fs::read(self.files[j].path.convert_to_pathbuf())
                             .expect(&("Unable to read ".to_string()+&self.files[j].path.convert_to_string()));
