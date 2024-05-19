@@ -1,4 +1,5 @@
 use rustypath::RPath;
+use colorized::*;
 
 pub struct File {
     path: RPath,
@@ -30,36 +31,50 @@ impl Count {
 }
 
 impl Files {
-    pub fn new(path: RPath, recursive: bool) -> Self {
+    pub fn new(path: RPath, recursive: bool, ignore: Vec<String>) -> Self {
         if recursive {
+            println!("-- {}","[Generating Directory Map]".color(Colors::YellowFg));
+            let f = Files::scan_recursive(&path, ignore);
+            println!("-- {}","[Generated Directory Map]\n".color(Colors::GreenFg));
             Self {
-                files: Files::scan_recursive(&path),
+                files: f,
             }
         } else {
+            println!("-- {}","[Generating Directory Map]".color(Colors::YellowFg));
+            let f = Files::scan(&path);
+            println!("-- {}","[Generated Directory Map]\n".color(Colors::GreenFg));
             Self{
-                files: Files::scan(&path),
+                files: f,
             }
         }
     }
 
-    fn scan_recursive(path: &RPath) -> Vec<File> {
+    fn scan_recursive(path: &RPath, ign: Vec<String>) -> Vec<File> {
+        let mut ignore: Vec<String> = Vec::new();
+        for x in &ign{
+            ignore.push(x.clone().to_lowercase());
+        }
         let mut file_rpaths: Vec<File> = Vec::new();
     
         if let Ok(entries) = std::fs::read_dir(path.convert_to_pathbuf()) {
             for entry in entries.flatten() {
                 let file_path = entry.path();
-                if file_path.ends_with(".cargo") || file_path.ends_with(".git") {
+                if file_path.file_name().unwrap().to_str().unwrap().starts_with(".") {
                     continue;
                 }
                 if file_path.is_dir() {
-                    // If the entry is a directory, recursively call scan on it
-                    let subdirectory_files = Self::scan_recursive(&RPath::new_from_pbuf(&file_path));
-                    for sub_file in subdirectory_files {
-                        file_rpaths.push(sub_file);
+                    if !ignore.contains(&file_path.file_name().unwrap().to_str().unwrap().to_lowercase()) {
+                        // If the entry is a directory, recursively call scan on it
+                        let subdirectory_files = Self::scan_recursive(&RPath::new_from_pbuf(&file_path), ignore.clone());
+                        for sub_file in subdirectory_files {
+                            file_rpaths.push(sub_file);
+                        }
+
                     }
                 } else {
                     // If the entry is a file, add it to the list of files
                     if let Some(file_name) = entry.file_name().to_str() {
+                        // println!("Found {}", path.join(&file_name).convert_to_string());
                         file_rpaths.push(File {
                             path: path.join(&file_name),
                             duplicates: Vec::new(),
@@ -135,6 +150,7 @@ impl Files {
                     } else if !done.contains(&self.files[j].path.convert_to_string()){
                         // if filesize of the comparing file is not filesize-200< size < filesize+200, dont compare
                         // this is a game changer -> super fast scanning.
+                        // println!("{}", self.files[j].path.convert_to_string());
                         if filesize > 200{
                             if !(std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() > filesize-200 && std::fs::metadata(self.files[j].path.convert_to_pathbuf()).expect("Failed to find file size.").len() < filesize + 200) {
                                 continue;
@@ -172,9 +188,9 @@ impl Files {
         let runtime = end_time.duration_since(start_time);
         println!("");
         if runtime.as_secs_f64() >= 60.0 {
-            println!("Scanned {} files in {:.2}m.", count.get(), runtime.as_secs_f64()/60.0);
+            println!("{} {} files in {:.2}m.", "Scanned".color(Colors::BlueFg), count.get(), runtime.as_secs_f64()/60.0);
         } else {
-            println!("Scanned {} files in {:.3}s.", count.get(), runtime.as_secs_f64());
+            println!("{} {} files in {:.3}s.", "Scanned".color(Colors::BlueFg), count.get(), runtime.as_secs_f64());
         }
     }
 
@@ -187,9 +203,9 @@ impl Files {
 
                 for d in &file.duplicates {
                     if count > 0 {
-                        string = string + ", " + &d.convert_to_string().replace("\\\\?\\", "");
+                        string = string + ", " + &d.convert_to_string().replace("\\\\?\\", "").color(Colors::WhiteBg).color(Colors::RedFg);
                     } else {
-                        string = string + " " + &d.convert_to_string().replace("\\\\?\\", "");
+                        string = string + " " + &d.convert_to_string().replace("\\\\?\\", "").color(Colors::WhiteBg).color(Colors::RedFg);
                     }
                     count += 1;
                 }
@@ -206,10 +222,10 @@ impl Files {
     pub fn formatted(&self) {
         for file in &self.files {
             if file.duplicates.len() > 0 {
-                println!("{}", file.path.convert_to_string().replace("\\\\?\\", ""));
+                println!("# {}", file.path.convert_to_string().replace("\\\\?\\", ""));
 
                 for d in &file.duplicates {
-                    println!("   {}  <- duplicate", d.convert_to_string().replace("\\\\?\\", ""));
+                    println!("   {}  <- duplicate", d.convert_to_string().replace("\\\\?\\", "").color(Colors::WhiteBg).color(Colors::RedFg));
                 }
 
                 println!("");
@@ -231,16 +247,16 @@ impl Files {
                     match std::fs::remove_file(d.convert_to_string()) {
                         Ok(_) => {
                             if formatted {
-                                println!("   DELETE {}", d.convert_to_string().replace("\\\\?\\", ""));
+                                println!("   {} {}", "DELETE".color(Colors::RedFg), d.convert_to_string().replace("\\\\?\\", ""));
                             } else {
-                                println!("DELETE {}", d.convert_to_string().replace("\\\\?\\", ""));
+                                println!("{} {}", "DELETE".color(Colors::RedFg),  d.convert_to_string().replace("\\\\?\\", ""));
                             }
                         },
                         Err(e) => {
                             if formatted {
-                                eprintln!("   DELETE ERROR {}: {}", e, d.convert_to_string().replace("\\\\?\\", ""));
+                                eprintln!("   {} {}: {}", "DELETE ERROR".color(Colors::RedFg), e, d.convert_to_string().replace("\\\\?\\", ""));
                             } else {
-                                eprintln!("DELETE ERROR {}: {}", e, d.convert_to_string().replace("\\\\?\\", ""));
+                                eprintln!("{} {}: {}", "DELETE ERROR".color(Colors::RedFg), e, d.convert_to_string().replace("\\\\?\\", ""));
                             }
                         }
                     }
